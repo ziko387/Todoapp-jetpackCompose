@@ -14,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,11 +27,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.MaterialTheme
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 @Composable
-fun LoginScreen(){
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(navController: NavController){
+   val  context= LocalContext.current
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var error by remember{ mutableStateOf<String?>(null) }
+
 
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -48,9 +58,9 @@ fun LoginScreen(){
             Spacer(modifier = Modifier.height(6.dp))
 
             OutlinedTextField(
-                value = username,
-                onValueChange = {username=it},
-                label = {Text("Username")},
+                value = email,
+                onValueChange = {email=it},
+                label = {Text("email")},
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(22.dp))
@@ -65,7 +75,26 @@ fun LoginScreen(){
 
             Spacer(modifier = Modifier.height(22.dp))
 
-            Button(onClick = {}, modifier = Modifier.fillMaxWidth(), colors =
+            error?.let {
+                Text(it, color = MaterialTheme.colorScheme.error)
+            }
+
+            Button(onClick = {
+                if (email.isBlank() || password.isBlank()){
+                    error="username and password required"
+                }else {
+
+                    Firebase.auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                navController.navigate("dashboard")
+                            } else {
+                                error = task.exception?.message ?: "Login failed"
+
+                            }
+                        }
+                }
+                }, modifier = Modifier.fillMaxWidth(), colors =
                 ButtonDefaults.buttonColors(containerColor = Color.Red)) {
 
                 Text(
@@ -74,12 +103,14 @@ fun LoginScreen(){
                 )
             }
 
+
             Spacer(modifier = Modifier.height(22.dp))
 
-            Text(
-                text = "don't have an account, signup "
-            )
-
+            TextButton(onClick = {navController.navigate("signup")}){
+                Text(
+                    text = "new member? register"
+                )
+            }
 
         }
     }
@@ -87,5 +118,5 @@ fun LoginScreen(){
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview(){
-    LoginScreen()
+    LoginScreen(rememberNavController())
 }

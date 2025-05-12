@@ -15,12 +15,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todoapp.Data.model.presentation.navigation.TodoNavGraph
 import com.example.todoapp.ui.theme.TodoappTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.google.firebase.Firebase
+import com.google.firebase.initialize
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // initialize firebase from the app
+        Firebase.initialize(this)
         setContent {
             TodoappTheme {
              val navController= rememberNavController()

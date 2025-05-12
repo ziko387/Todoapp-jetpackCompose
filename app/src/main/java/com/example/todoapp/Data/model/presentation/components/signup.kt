@@ -1,5 +1,6 @@
 package com.example.todoapp.Data.model.presentation.components
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,13 +29,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CheckboxDefaults.colors
+import androidx.compose.material3.TextButton
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
 
 @Composable
-fun SignUpPage(){
+fun SignUpPage(navController: NavController){
+    //variables to store and reference inputs
+    val context= LocalContext.current//declares the current processing Activity
     var email by remember{ mutableStateOf("") }
     var username by remember{ mutableStateOf("") }
     var password by remember{ mutableStateOf("") }
     var confirmPassword by remember{ mutableStateOf("") }
+    var error by remember{ mutableStateOf<String?>(null) }
 
     Card(
         modifier = Modifier.padding(24.dp),
@@ -62,7 +75,7 @@ fun SignUpPage(){
                 OutlinedTextField(
                     value = email,
                     onValueChange = {email=it},
-                    label = {Text("username")},
+                    label = {Text("email")},
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(22.dp))
@@ -91,9 +104,22 @@ fun SignUpPage(){
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
                 )
+           // error is populated on the condition that an error is encountered
+            // the error variable will be populated within a text composable
+            // showing the error
+                error?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error)
+                }
                 Spacer(modifier = Modifier.height(22.dp))
 
-                Button(onClick = {}, modifier = Modifier.fillMaxWidth(),
+                Button(onClick = {
+                    if(password!=confirmPassword){
+                        error="passwords do not match"
+                    }
+                    else{
+                        registerUser(email,password,context,navController,onError={errorMsg-> error =errorMsg})
+                    }
+                }, modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
 
                     Text(
@@ -102,18 +128,38 @@ fun SignUpPage(){
                     )
                 }
                 Spacer(modifier = Modifier.height(22.dp))
-
-                Text(
-                    text = " have an account? login",
-                    fontSize = 27.sp
-                )
+                // navigate login // navigate to login
+                TextButton(onClick = { navController.navigate("login") }) {
+                    Text(
+                        text = "already have an account, login"
+                    )
+                }
             }
         }
     }
 }
 
+private fun registerUser(
+    email: String,
+    password: String,
+    context: Context,
+    navController: NavController,
+    onError: (String) -> Unit
+) {
+    Firebase.auth.createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // navigate to the dashboard
+                navController.navigate("login")
+            } else {
+            onError(task.exception?.message ?: "Registration failed")
+            }
+
+        }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun SignUpPagePreview(){
-    SignUpPage()
+    SignUpPage(rememberNavController())
 }

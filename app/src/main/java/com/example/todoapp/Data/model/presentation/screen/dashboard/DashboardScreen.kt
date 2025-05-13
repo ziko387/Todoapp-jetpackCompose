@@ -17,55 +17,109 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todoapp.Data.model.presentation.components.TodoItemCard
 import android.app.AlertDialog
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalNavigationDrawer
 import com.example.todoapp.Data.model.presentation.screen.addTodo.AddToDoForm
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.example.todoapp.Data.model.presentation.components.DrawerContents
+import com.google.firebase.auth.FirebaseAuth
+import com.example.todoapp.Data.model.presentation.screen.dashboard.DashboardViewModel
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(viewModel: DashboardViewModel = hiltViewModel()) {
+fun DashboardScreen(
+    navcontroller: NavController, viewModel: DashboardViewModel = hiltViewModel()) {
     // fetch our todos from the viewmodel
     val todos by viewModel.todos.collectAsState()
     // to create a list of composables {listview}
     val showAddingDialog = remember { mutableStateOf(false) }
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddingDialog.value = true }) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "add todo"
-                )
-            }
-        }
-    ) { padding ->
+    //drawer state menu
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    //courintine scope: handle configs on device change
+    val corountineScope= rememberCoroutineScope()
 
-        LazyColumn (modifier = Modifier.padding(padding)) {
-            items(todos){
-                todo -> TodoItemCard(
-                 todo=todo,
+    ModalNavigationDrawer(
+        drawerContent = {
+           DrawerContents(onNavigateToHome = {
+               navcontroller.navigate("home")
+           },
+            onLogout = {
+                FirebaseAuth.getInstance().signOut()
+                navcontroller.navigate("login"){
+                    popUpTo("dashboard"){inclusive=true}
+                }
+            }   )
+        }
+
+
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title={Text("Dash;board")},
+                    navigationIcon = {
+                       IconButton(onClick = {corountineScope
+                           .launch { drawerState.open() }
+                       }) {
+                           Icon(Icons.Default.Menu,
+                               contentDescription = "menu")
+                       }
+                    } )
+
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { showAddingDialog.value = true }) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "add todo"
+                    )
+                }
+            }
+        ) { padding ->
+
+            LazyColumn (modifier = Modifier.padding(padding)) {
+                items(todos){
+                        todo -> TodoItemCard(
+                    todo=todo,
                     onCompleteChange = {viewModel.toogleTodoCompletion(todo.id)}
-            )
+                )
+
+                }
+            }
+            if (showAddingDialog.value){
+                //
+                //
+                AlertDialog(
+                    onDismissRequest={showAddingDialog.value=false},
+                    title={Text("add todo")},
+                    text = {
+                        AddToDoForm(viewModel = viewModel,
+                            onDismiss = {showAddingDialog.value=false})
+                    },
+                    confirmButton = {},
+                    dismissButton = {}
+                )
 
             }
+
+
         }
-  if (showAddingDialog.value){
-   //
-      //
-      AlertDialog(
-          onDismissRequest={showAddingDialog.value=false},
-          title={Text("add todo")},
-          text = {
-              AddToDoForm(viewModel = viewModel,
-                  onDismiss = {showAddingDialog.value=false})
-          },
-          confirmButton = {},
-          dismissButton = {}
-      )
-
-}
-
-
     }
+
+
 }
+
+

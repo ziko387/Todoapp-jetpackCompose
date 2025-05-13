@@ -19,7 +19,7 @@ fun TodoNavGraph(navController:NavHostController){
         }
      composable ("dashboard"){
          DashboardScreen(
-
+navController
          )
      }
     }

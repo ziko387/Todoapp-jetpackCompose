@@ -106,6 +106,18 @@ fun TodoItemCard(
 
 
             )
+
+        }
+        Row (modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically){
+            Spacer(modifier = Modifier.weight(1f))
+            Button(onClick = {}) {
+                Text(text = "Edit")
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = {}) {
+                Text(text = "Delete")
+            }
         }
     }
 
@@ -130,7 +142,7 @@ TodoItemCard(
         id = 1,
         title = "sample todo",
         description = "sample text",
-        imageuri = null,
+        imageUri = null,
         taskers = "musa",
         isCompleted = false
     ),

@@ -1,5 +1,6 @@
 package com.example.todoapp.Data.repository
 
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import com.example.todoapp.Data.model.Todoitem
 import kotlinx.coroutines.flow.Flow
@@ -7,11 +8,11 @@ import kotlinx.coroutines.flow.flowOf
 
 class MockTodoRepository : TodoRepository{
     private  val todos = mutableListOf(
-        Todoitem(105,"buy stocks","eggs",
+        Todoitem(105,105,"buy stocks","eggs",
             null,"musa",2024,false),
-        Todoitem(106,"add cars","toyota",null,"musa",
+        Todoitem(106,106,"add cars","toyota",null,"musa",
         2025, false),
-        Todoitem(106,"add cars","issuzu",null,"musa",
+        Todoitem(106,106,"add cars","issuzu",null,"musa",
             2025, false)
     )
     private val nextId= 3
@@ -37,5 +38,15 @@ class MockTodoRepository : TodoRepository{
            todos[index] = todo
         }
     }
+
+    override suspend fun uploadToFirebase(todo: Todoitem) {
+        // upload process
+    }
+
+    override suspend fun uploadImageToFirebase(imageUri: Uri): String {
+        // mock url
+        return "mock_url"
+    }
+
 
 }

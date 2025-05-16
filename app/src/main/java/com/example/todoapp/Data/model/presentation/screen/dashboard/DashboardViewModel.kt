@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.NonCancellable.isCompleted
 import kotlinx.coroutines.internal.OpDescriptor
 import javax.inject.Inject
+import android.net.Uri
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(private val repository: TodoRepository
@@ -41,17 +42,25 @@ class DashboardViewModel @Inject constructor(private val repository: TodoReposit
 
     }
     // function to add data
-    fun addToDo(title: String, description: String,taskers: String){
+    fun addToDo(title: String, description: String,taskers: String,
+   imageUri:Uri? ){
         viewModelScope.launch {
+            var imageUrl: String?=null
+            if(imageUri!=null){
+               // imageUrI=repository.uploadImageToFirebase(imageUri)
+            }
             val newTodo = Todoitem(
                 id=0,
                 title=title,
                 description=description,
-                imageuri = null,
+                imageUri = imageUrl,
                 taskers = taskers,
                 isCompleted = false
-            )
+              )
+            //room Database insert
             repository.insertTodo(newTodo)
+            // firebase insert
+            repository.uploadToFirebase(newTodo)
         }
     }
 

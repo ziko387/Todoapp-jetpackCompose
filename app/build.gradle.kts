@@ -67,6 +67,11 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     //
     implementation("com.google.firebase:firebase-auth-ktx")
+    //firebase database
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+    // coil : image loader
+    implementation("io.coil-kt:coil-compose:2.4.0")
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

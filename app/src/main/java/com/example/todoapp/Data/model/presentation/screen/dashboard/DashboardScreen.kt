@@ -68,7 +68,7 @@ fun DashboardScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title={Text("Dash;board")},
+                    title={Text("Dashboard")},
                     navigationIcon = {
                        IconButton(onClick = {corountineScope
                            .launch { drawerState.open() }

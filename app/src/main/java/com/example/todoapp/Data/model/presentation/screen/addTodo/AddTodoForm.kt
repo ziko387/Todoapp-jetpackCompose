@@ -25,6 +25,14 @@ import com.example.todoapp.Data.model.presentation.screen.dashboard.DashboardVie
 import com.example.todoapp.Data.repository.MockTodoRepository
 import com.example.todoapp.Data.repository.TodoRepository
 import java.nio.file.WatchEvent
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import kotlin.contracts.contract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun AddToDoForm(
@@ -32,6 +40,14 @@ fun AddToDoForm(
     onDismiss:() -> Unit
 ){
     // variable to save inputs
+    val context= LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    // define a reference for activity launcher
+    //allows acess to other multimedia apps
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()){
+        uri: Uri? -> imageUri = uri
+    }
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var taskers by remember { mutableStateOf("") }
@@ -61,6 +77,17 @@ fun AddToDoForm(
             label = {Text("Taskers")},
             modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
         )
+        // button to pick images
+        Button(onClick = {
+            imagePicker.launch("image/*")
+        }) {Text(
+            text = "select image"
+        ) }
+        // image container
+        imageUri?.let {
+            Image(painter=rememberAsyncImagePainter(it),
+                contentDescription = null)
+        }
         Row (modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween){
             Button(onClick = onDismiss,
@@ -69,7 +96,7 @@ fun AddToDoForm(
             }
             Button(onClick = {
                 if(title.isNotBlank()){
-                viewModel.addToDo(title,description,taskers)
+                viewModel.addToDo(title,description,taskers,imageUri)
                     onDismiss()
                 }
             }, enabled = title.isNotBlank()) {

@@ -53,4 +53,10 @@ steps
 6. Provide hilt to the launched screen
 7. get build - clean projects
 8. file - invalidate caches - check all checkboxes
+
+
+   ## firebase Crud 
+1. add dependencies for firebase database
+2. implementation("com.google.firebase:firebase-database-ktx")
+
    

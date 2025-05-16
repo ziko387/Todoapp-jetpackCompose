@@ -10,7 +10,7 @@ import com.example.todoapp.Data.model.Todoitem
 // layer
 @Database(
   entities = [Todoitem::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract  class  AppDatabase : RoomDatabase(){

@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.flowOf
 
 class MockTodoRepository : TodoRepository{
     private  val todos = mutableListOf(
-        Todoitem(105,105,"buy stocks","eggs",
+        Todoitem(105,"ken","buy stocks","eggs",
             null,"musa",2024,false),
-        Todoitem(106,106,"add cars","toyota",null,"musa",
+        Todoitem(106,"ken","add cars","toyota",null,"musa",
         2025, false),
-        Todoitem(106,106,"add cars","issuzu",null,"musa",
+        Todoitem(106,"ken","add cars","issuzu",null,"musa",
             2025, false)
     )
     private val nextId= 3
@@ -20,6 +20,9 @@ class MockTodoRepository : TodoRepository{
         return flowOf(todos.toList())
     }
 
+    override fun fenchtodosfromFirebase(): Flow<List<Todoitem>> {
+        return flowOf(todos.toList())
+    }
     override suspend fun getTodoById(id: Int): Todoitem? {
         return todos.find{it.id == id}
     }
@@ -46,6 +49,14 @@ class MockTodoRepository : TodoRepository{
     override suspend fun uploadImageToFirebase(imageUri: Uri): String {
         // mock url
         return "mock_url"
+    }
+
+    override suspend fun deleteTodoFirebase(todo: Todoitem) {
+        //
+    }
+
+    override suspend fun updateTodoFirebase(todo: Todoitem) {
+        //
     }
 
 

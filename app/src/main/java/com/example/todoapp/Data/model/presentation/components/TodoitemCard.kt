@@ -58,7 +58,9 @@ import java.nio.file.WatchEvent
 @Composable
 fun TodoItemCard(
     todo : Todoitem,
-    onCompleteChange: (Boolean) -> Unit
+    onCompleteChange: (Boolean) -> Unit,
+    onEditClick:(Todoitem) -> Unit,
+    onDeleteClick:(Todoitem) -> Unit
 ) {
     Card (
         modifier = Modifier.fillMaxWidth()
@@ -115,7 +117,7 @@ fun TodoItemCard(
                 Text(text = "Edit")
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Button(onClick = {}) {
+            Button(onClick = {onDeleteClick(todo)}) {
                 Text(text = "Delete")
             }
         }
@@ -148,6 +150,12 @@ TodoItemCard(
     ),
     onCompleteChange = {
         isChecked -> println("checked:$isChecked")
+    },
+    onEditClick = {todo ->
+        println("Edit:${todo.title}")
+    },
+    onDeleteClick = { todo ->
+        println("Delete:${todo.title}")
     }
 )
 

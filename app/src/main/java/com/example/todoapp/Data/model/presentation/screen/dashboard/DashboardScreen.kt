@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
+import com.example.todoapp.Data.model.Todoitem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +44,13 @@ fun DashboardScreen(
     navcontroller: NavController, viewModel: DashboardViewModel = hiltViewModel()) {
     // fetch our todos from the viewmodel
     val todos by viewModel.todos.collectAsState()
+    // fenches from firebase todos
+    val firebasetodos by viewModel.firebasetodos.collectAsState()
     // to create a list of composables {listview}
     val showAddingDialog = remember { mutableStateOf(false) }
+    // selected to do
+    val showEditDialog = remember { mutableStateOf(false) }
+    val todoBeingEdited=remember { mutableStateOf<Todoitem?>(null) }
     //drawer state menu
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     //courintine scope: handle configs on device change
@@ -91,10 +97,22 @@ fun DashboardScreen(
         ) { padding ->
 
             LazyColumn (modifier = Modifier.padding(padding)) {
-                items(todos){
+                // use todos variables to load items from rooms
+                // firebasetodos variables to load items from firebase
+                items(firebasetodos){
                         todo -> TodoItemCard(
                     todo=todo,
-                    onCompleteChange = {viewModel.toogleTodoCompletion(todo.id)}
+                    onCompleteChange = {
+                        viewModel.toogleTodoCompletion(todo.id)
+                    },
+                     onEditClick={
+                         todoBeingEdited.value=it
+                         showEditDialog.value=true
+
+                     } ,
+                     onDeleteClick={
+                         viewModel.deleteTodoFromFirebase(it)
+                    }
                 )
 
                 }
@@ -114,7 +132,15 @@ fun DashboardScreen(
                 )
 
             }
-
+       //edit dialog
+            if (showEditDialog.value && todoBeingEdited.value !=null){
+                AlertDialog(
+                    onDismissRequest = {showEditDialog.value=false},
+                    title = {Text("Edit todo")},
+                    text = {Text("edit your todo")},
+                    confirmButton = {}
+                )
+            }
 
         }
     }

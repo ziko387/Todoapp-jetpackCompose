@@ -31,6 +31,23 @@ class DashboardViewModel @Inject constructor(private val repository: TodoReposit
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+    //getting our todos from the firebase
+    val firebasetodos:StateFlow<List<Todoitem>> = repository.fenchtodosfromFirebase().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+    //expose the update and delete functions
+    fun deleteTodoFromFirebase(todo: Todoitem){
+        viewModelScope.launch {
+            repository.deleteTodoFirebase(todo)
+        }
+    }
+    fun updateTodoFromFirebase(todo: Todoitem){
+        viewModelScope.launch {
+            repository.updateTodoFirebase(todo)
+        }
+    }
 
     fun toogleTodoCompletion(todoId: Int){
 
